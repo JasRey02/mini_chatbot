@@ -1,66 +1,148 @@
-const chat = document.getElementById("chat");
+const chat =
+document.getElementById("chat");
 
-function addMessage(text, type){
+const input =
+document.getElementById("message");
 
-    const div = document.createElement("div");
+loadMessages();
 
-    div.className = `msg ${type}`;
+function addMessage(
+text,
+type
+){
 
-    div.textContent = text;
+const div =
+document.createElement("div");
 
-    chat.appendChild(div);
+div.className =
+`msg ${type}`;
 
-    chat.scrollTop = chat.scrollHeight;
+div.textContent =
+text;
+
+chat.appendChild(div);
+
+saveMessages();
+
+chat.scrollTop =
+chat.scrollHeight;
+
 }
 
-function botReply(text){
+function saveMessages(){
 
-    text = text.toLowerCase();
+localStorage.setItem(
+"chat",
+chat.innerHTML
+);
 
-    if(text.includes("hola"))
-        return "Hola 👋 ¿Cómo estás?";
-
-    if(text.includes("nombre"))
-        return "Soy un Mini ChatBot";
-
-    if(text.includes("hora"))
-        return `Son las ${new Date().toLocaleTimeString()}`;
-
-    return "No entendí eso 😅";
 }
 
-function sendMessage(){
+function loadMessages(){
 
-    const input =
-        document.getElementById("message");
+const saved =
+localStorage.getItem(
+"chat"
+);
 
-    const text =
-        input.value.trim();
+if(saved)
+chat.innerHTML =
+saved;
 
-    if(!text)
-        return;
+}
 
-    addMessage(text,"user");
+function answer(text){
 
-    setTimeout(()=>{
+text =
+text.toLowerCase();
 
-        addMessage(
-            botReply(text),
-            "bot"
-        );
+if(text.includes("hola"))
+return "Hola 👋";
 
-    },500);
+if(text.includes("hora"))
+return new Date()
+.toLocaleTimeString();
 
-    input.value="";
+if(text.includes("github"))
+return "Puedes subir este proyecto usando GitHub Pages 🚀";
+
+if(text.includes("adios"))
+return "Hasta luego";
+
+return "Todavía soy pequeño 😅";
+
+}
+
+function typing(){
+
+const div =
+document.createElement("div");
+
+div.className =
+"msg bot typing";
+
+div.id =
+"typing";
+
+div.textContent =
+"Escribiendo...";
+
+chat.appendChild(div);
+
+chat.scrollTop =
+chat.scrollHeight;
+
+}
+
+function send(){
+
+const text =
+input.value.trim();
+
+if(!text)
+return;
+
+addMessage(
+text,
+"user"
+);
+
+input.value="";
+
+typing();
+
+setTimeout(()=>{
+
+document
+.getElementById(
+"typing"
+)
+.remove();
+
+addMessage(
+answer(text),
+"bot"
+);
+
+},1000);
+
 }
 
 document
-.getElementById("message")
+.getElementById(
+"send"
+)
+.onclick =
+send;
+
+input
 .addEventListener(
-"keypress",
+"keydown",
 e=>{
 
-if(e.key==="Enter")
-sendMessage();
+if(
+e.key==="Enter"
+)
+send();
 
 });
